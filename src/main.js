@@ -9,7 +9,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-import { firebaseApp } from './assets/firebase'
+import firebaseApp from './assets/firebase'
 
 import { VueFire, VueFireAuth } from 'vuefire'
 

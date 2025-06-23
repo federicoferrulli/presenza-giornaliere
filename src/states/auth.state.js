@@ -3,9 +3,14 @@ import {
     GoogleAuthProvider,
     signInWithRedirect,
     getRedirectResult,
-    signOut
+    signOut,
+    signInWithPopup
 } from 'firebase/auth'
-import { useFirebaseAuth } from 'vuefire'
+
+import { 
+    useFirebaseAuth,
+    useCurrentUser 
+} from 'vuefire'
 
 /**
  * @module stores/auth
@@ -42,7 +47,7 @@ export const useAuthState = defineStore('auth', {
         * Il provider di autenticazione di Google.
         * @type {typeof GoogleAuthProvider}
         */
-        provider: GoogleAuthProvider,
+        provider: new GoogleAuthProvider(),
         /**
         * Oggetto per tracciare lo stato di caricamento delle azioni asincrone.
         * La chiave è il nome dell'azione.
@@ -67,7 +72,7 @@ export const useAuthState = defineStore('auth', {
         * Da chiamare all'avvio dell'applicazione (es. in App.vue).
         */
         isLoggedIn(state) {
-            return !!state.user;
+            return state.user;
         },
     },
     actions: {
@@ -76,15 +81,15 @@ export const useAuthState = defineStore('auth', {
         * @async
         * @returns {Promise<void>} Una promessa che si risolve quando il reindirizzamento è stato avviato.
         */
-        async redirectSign() {
-            this.loading['redirectSign'] = true;
+        async signIn() {
+            this.loading['signIn'] = true;
             try {
-                console.log(this.auth, this.provider)
-                await signInWithRedirect(this.auth, this.provider)
+                const result = await signInWithPopup(this.auth, this.provider)
+                this.user = result?.user;
             } catch (e) {
-                this.error['redirectSign'] = e;
+                this.error['signIn'] = e;
             } finally {
-                this.loading['redirectSign'] = false;
+                this.loading['signIn'] = false;
             }
         },
         /**
@@ -97,9 +102,9 @@ export const useAuthState = defineStore('auth', {
             this.loading['getRedirectSign'] = true;
             try {
                 const result = await getRedirectResult(this.auth)
-                const credential = this.provider.credentialFromResult(result);
-                this.user = result.user;
+                this.user = result?.user;
             } catch (e) {
+                console.log(e)
                 this.error['getRedirectSign'] = e;
             } finally {
                 this.loading['getRedirectSign'] = false;
