@@ -1,15 +1,14 @@
 import { defineStore } from 'pinia'
 import {
     GoogleAuthProvider,
-    signInWithRedirect,
+    // signInWithRedirect,
     getRedirectResult,
     signOut,
     signInWithPopup
 } from 'firebase/auth'
 
 import { 
-    useFirebaseAuth,
-    useCurrentUser 
+    useFirebaseAuth, 
 } from 'vuefire'
 
 /**
@@ -87,6 +86,7 @@ export const useAuthState = defineStore('auth', {
                 const result = await signInWithPopup(this.auth, this.provider)
                 this.user = result?.user;
             } catch (e) {
+                console.log(e)
                 this.error['signIn'] = e;
             } finally {
                 this.loading['signIn'] = false;
@@ -130,4 +130,11 @@ export const useAuthState = defineStore('auth', {
         }
 
     }
-})
+},  {
+        persist: {
+            storage: localStorage,
+            pick: ['user'],
+            omit: ['auth', 'provider', 'loading', 'error'],
+        }
+    }
+)

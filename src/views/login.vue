@@ -21,6 +21,7 @@
             </a-button>
             
         </a-flex>
+        {{ AuthState.error['signIn'] }}
         <div v-if="AuthState.error['signIn']">
             <a-typography-text type="danger">
                 Errore nella login
@@ -34,11 +35,10 @@
 </style>
 <script setup>
 
-import { h, onMounted } from 'vue';
+import { h } from 'vue';
 import { useAuthState } from '@/states/auth.state'
 import { GoogleOutlined } from '@ant-design/icons-vue'
 
 const AuthState = useAuthState()
-
-
 </script>
+
