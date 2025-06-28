@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthState } from '@/states/auth.state'
+
+import { getCurrentUser } from 'vuefire'
 
 
 const router = createRouter({
@@ -15,8 +16,8 @@ const router = createRouter({
         },
         {
             path: '/',
-            name: 'home',
-            // component: homepage,
+            name: 'homepage',
+            component: () => import('@/views/homepage.vue'),
         },
     ],
 
@@ -24,22 +25,27 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
 
-    const AuthState = useAuthState()
+    const currentUser = await getCurrentUser();
 
-    if (to.meta.auth === false) {
+   
+    if (to.meta.auth === false && !currentUser) {
         next();
         return false;
     }
 
-    if (!AuthState.isLoggedIn && to.name != 'login') {
+    if (!currentUser) {
 
         next({
             name: 'login',
-            query: {
-                redirect: to.fullPath,
-            }
         })
 
+        return;
+    }
+    
+    if(currentUser && to.name === 'login'){
+        next({
+            name: 'homepage',
+        })
         return;
     }
 
