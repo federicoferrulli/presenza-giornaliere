@@ -1,4 +1,5 @@
 <template>
+  <addEvent :title="'Nuova attività'" :onClose="onToggleModal" :onSubmit="onSubmitModal" :open="modalOpen" ></addEvent>
   <div class="p-4">
     <div class="flex flex-col lg:flex-row gap-4">
       <div class="flex-1 min-w-0">
@@ -10,11 +11,16 @@
           </template>
         </a-calendar>
       </div>
-            
+      
       <div class="w-full lg:w-150 flex-shrink-0">
         <a-list bordered :data-source="activities">
           <template #header>
-            <div>Attività del {{ date.format('DD-MM-YYYY') }}</div>
+            <div class="flex justify-between">
+              <div>Attività del {{ date.format('DD-MM-YYYY') }}</div>
+              <div>
+                <a-button @click="onToggleModal" shape="circle">+</a-button>
+              </div>  
+            </div>
           </template>
           <template #renderItem="{ item }">
             <a-list-item>
@@ -23,15 +29,24 @@
           </template>
         </a-list>
       </div>
+
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onUnmounted, ref, onMounted } from 'vue';
+import { computed, ref, h } from 'vue';
 import dayjs from 'dayjs';
+import addEvent from '@/components/addEvent.vue';
 import 'dayjs/locale/it';
+import { storeToRefs } from 'pinia';
+
+import { useResponsiveStore } from '@/states/responsive.state.js';
+
+const responsiveStore = useResponsiveStore();
+const { isLargeScreen } = storeToRefs(responsiveStore);
 dayjs.locale('it')
+
 const objLang = {
   "lang": {
     "locale": "it_IT",
@@ -39,22 +54,19 @@ const objLang = {
     "year": "Anno",
   }
 }
-// Using window.matchMedia for breakpoint detection (Tailwind's lg is 1024px)
-const mediaQuery = window.matchMedia('(min-width: 1024px)');
-const isLargeScreen = ref(mediaQuery.matches);
 
-const handleMediaQueryChange = (e) => {
-  isLargeScreen.value = e.matches;
-};
-
-onMounted(() => {
-  mediaQuery.addEventListener('change', handleMediaQueryChange);
-});
-
-onUnmounted(() => {
-  mediaQuery.removeEventListener('change', handleMediaQueryChange);
-});
 const date = ref(dayjs());
+
+const modalOpen = ref(false)
+
+function onToggleModal(){
+  modalOpen.value = !modalOpen.value;
+}
+
+function onSubmitModal(){
+  modalOpen.value = false;
+}
+
 
 const getListData = value => {
   let listData;
