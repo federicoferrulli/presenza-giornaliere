@@ -1,9 +1,9 @@
 <template>
-  <addEvent :title="'Nuova attività'" :onClose="onToggleModal" :onSubmit="onSubmitModal" :open="modalOpen" ></addEvent>
+  <addEvent :title="'Nuova attività'" :currDate="date" :onClose="onToggleModal" :onSubmit="onSubmitModal" :open="modalOpen" ></addEvent>
   <div class="p-4">
     <div class="flex flex-col lg:flex-row gap-4">
       <div class="flex-1 min-w-0">
-        <a-calendar :locale="objLang" v-model:value="date" :fullscreen="isLargeScreen" @panelChange="onPanelChange">
+        <a-calendar :locale="objLang" v-model:value="date" :fullscreen="isLargeScreen" @change="onPanelChange" @panelChange="onPanelChange">
           <template #dateCellRender="{ current }">
             <ul class="events">
               <a-badge v-if="getListData(current).length > 0" :status="'warning'" class="w-full" />
@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { computed, ref, h } from 'vue';
+import { computed, ref } from 'vue';
 import dayjs from 'dayjs';
 import addEvent from '@/components/addEvent.vue';
 import 'dayjs/locale/it';
@@ -102,6 +102,7 @@ const activities = computed(() => {
 const onPanelChange = (value) => {
   date.value = value;
 };
+
 </script>
 
 <style scoped>
