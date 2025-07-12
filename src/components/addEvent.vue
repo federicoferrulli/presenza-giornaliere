@@ -5,7 +5,6 @@
       <a-button style="margin-right: 8px" @click="onClose">Annulla</a-button>
       <a-button type="primary" @click="onSubmit">Salva</a-button>
     </template> -->
-    
     <a-form ref="formRef" layout="vertical" :model="newPayload">
       
       <a-form-item label="Categoria"  name="type" v-bind="{rules: [{ type: 'number', required: true, message: 'Seleziona categoria!'}]}" >
@@ -58,24 +57,16 @@
 import { defineProps, reactive, toRaw, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useResponsiveStore } from '@/states/responsive.state.js';
+import { inject } from 'vue'
 
 import { message } from 'ant-design-vue';
 
 const differentType = ref(true); 
 let loading = ref(false); 
+const types = inject('types');
+const EventDTO = inject('EventDTO');
 
 const formRef = ref();
-const types = [
-  {id: null, value: '--'},
-  {id: 1, value: 'Attività'},
-  {id: 2, value: 'Ferie'},
-  {id: 3, value: 'Malattia'},
-  {id: 4, value: 'Festività'},
-  {id: 5, value: 'Donazione/Elezione'},
-  {id: 6, value: 'Sciopero'},
-  {id: 7, value: 'Legge 104'},
-  {id: 8, value: 'Lutto'}
-]
 
 const responsiveStore = useResponsiveStore();
 const { isLargeScreen } = storeToRefs(responsiveStore);
@@ -110,11 +101,12 @@ async function submitForm(){
     }
    
 
-    let duration = getDuration(
+    const duration = getDuration(
       new Date(new Date(props.currDate).toISOString().split('T')[0] +' '+newPayload.dateEnd), 
       new Date(new Date(props.currDate).toISOString().split('T')[0] +' '+ newPayload.dateStart), 
       'ms'
     )
+    
     props.onSubmit({...toRaw(newPayload), currDate: props.currDate, duration})
     formRef.value.resetFields();
     newPayload = reactive({

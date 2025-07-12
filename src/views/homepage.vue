@@ -11,20 +11,32 @@
           </template>
         </a-calendar>
       </div>
-      
       <div class="w-full lg:w-150 flex-shrink-0">
         <a-list bordered :data-source="activities">
           <template #header>
             <div class="flex justify-between">
               <div>Attività del {{ date.format('DD-MM-YYYY') }}</div>
               <div>
-                <a-button @click="onToggleModal" shape="circle">+</a-button>
+                <a-button type="link" @click="onToggleModal" shape="circle">+</a-button>
               </div>  
             </div>
           </template>
           <template #renderItem="{ item }">
             <a-list-item>
-              <a-badge :status="item.type" :text="item.content" />
+              
+              <a-list-item-meta
+                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+              >
+                <template #title>
+                  <a-badge :status="item.type" :text="item.content" />
+                </template>
+              </a-list-item-meta>
+           
+
+              <template #actions>
+                <a key="list-loadmore-edit"><EditOutlined></EditOutlined></a>
+                <a key="list-loadmore-delete"><DeleteOutlined></DeleteOutlined></a>
+              </template>
             </a-list-item>
           </template>
         </a-list>
@@ -36,12 +48,26 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { inject } from 'vue'
 import dayjs from 'dayjs';
 import addEvent from '@/components/addEvent.vue';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue';
 import 'dayjs/locale/it';
 import { storeToRefs } from 'pinia';
-
 import { useResponsiveStore } from '@/states/responsive.state.js';
+import { useFirestore, useCollection } from 'vuefire'
+import { collection, doc, addDoc, setDoc } from 'firebase/firestore'
+import { message } from 'ant-design-vue';
+import { useCurrentUser } from 'vuefire'
+
+
+const types = inject('types');
+const EventDTO = inject('EventDTO');
+
+const currentUser = useCurrentUser()
+const db = useFirestore();
+const currEvents = useCollection(collection(db, 'events'))
+console.log(currEvents)
 
 const responsiveStore = useResponsiveStore();
 const { isLargeScreen } = storeToRefs(responsiveStore);
@@ -63,8 +89,21 @@ function onToggleModal(){
   modalOpen.value = !modalOpen.value;
 }
 
-function onSubmitModal(){
+async function onSubmitModal(payload){
+  
   modalOpen.value = false;
+  
+  const currEvent = new EventDTO(payload);
+  currEvent.userId = currentUser.value.uid;
+  console.log(currEvent.toObject())
+  try {
+    await addDoc(collection(db, "events"), currEvent.toObject());
+    message.success("Evento inserito correttamente!");
+  } catch (e) {
+    console.log('error', e);
+    message.error("C'è qualcosa non va :(");
+  }
+
 }
 
 
