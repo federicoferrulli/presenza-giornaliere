@@ -16,17 +16,24 @@ import { VueFire, VueFireAuth } from 'vuefire'
 const app = createApp(App)
 const pinia = createPinia()
 
-app.provide('types', Object.freeze([
-    {id: null, value: '--'},
-    {id: 1, value: 'Attività', colour: 'green'},
-    {id: 2, value: 'Ferie', colour: 'blue' },
-    {id: 3, value: 'Malattia', colour: 'red'},
-    {id: 4, value: 'Festività', colour: 'aquamarine'},
-    {id: 5, value: 'Donazione/Elezione', colour: 'brown'},
-    {id: 6, value: 'Sciopero', colour: 'yellow'},
-    {id: 7, value: 'Legge 104', colour: 'orange'},
-    {id: 8, value: 'Lutto', colour: 'black'}
-]));
+app.provide('types', Object.freeze({
+      data: [
+        {id: null, value: '--'},
+        {id: 1, value: 'Attività', colour: 'green'},
+        {id: 2, value: 'Ferie', colour: 'blue' },
+        {id: 3, value: 'Malattia', colour: 'red'},
+        {id: 4, value: 'Festività', colour: 'aquamarine'},
+        {id: 5, value: 'Donazione/Elezione', colour: 'brown'},
+        {id: 6, value: 'Sciopero', colour: 'yellow'},
+        {id: 7, value: 'Legge 104', colour: 'orange'},
+        {id: 8, value: 'Lutto', colour: 'black'}
+      ],
+      getById: function(id){
+        return this.data.find(elem=>elem.id == id);
+      }
+    }
+  )
+);
 
 app.provide('EventDTO', class EventDTO{
   constructor({

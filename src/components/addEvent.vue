@@ -14,7 +14,7 @@
             @change="onCategoryChange"
             style="width: 120px"
           >
-            <template v-for="category in types" >
+            <template v-for="category in types.data" >
               <a-select-option :value="category.id">{{ category.value }}</a-select-option>
             </template>
           </a-select>
